@@ -1,5 +1,5 @@
 baseURL = 'https://patrickthebold.github.io/'
 languageCode = 'en-us'
-title = "Coding Thoughts"
+title = "Patrick's Blog"
 theme = "noteworthy"
 pygmentsCodeFences = true
