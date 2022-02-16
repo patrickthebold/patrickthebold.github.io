@@ -175,7 +175,7 @@ The first thing we'd want to look at
 is the request and response we made to these external APIs (after all, we want
 to pass the blame as quickly as possible if it's an upstream error). Now, for
 various reasons we didn't want to log all the requests and responses.  So,
-every for external API call, we returned the full request/response in addition
+for every external API call, we returned the full request/response in addition
 to whatever we wanted to. At least, in QA environments. 
 
 Consider the following return type:
