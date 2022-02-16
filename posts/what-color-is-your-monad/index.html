@@ -150,7 +150,7 @@ The first thing we&rsquo;d want to look at
 is the request and response we made to these external APIs (after all, we want
 to pass the blame as quickly as possible if it&rsquo;s an upstream error). Now, for
 various reasons we didn&rsquo;t want to log all the requests and responses. So,
-every for external API call, we returned the full request/response in addition
+for every external API call, we returned the full request/response in addition
 to whatever we wanted to. At least, in QA environments.</p>
 <p>Consider the following return type:</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-scala data-lang=scala><span style=color:#66d9ef>def</span> getUser<span style=color:#f92672>(</span>userId<span style=color:#f92672>)</span><span style=color:#66d9ef>:</span> <span style=color:#960050;background-color:#1e0010>[</span><span style=color:#66d9ef>DiagnosticData</span><span style=color:#f92672>[],</span> <span style=color:#a6e22e>User</span><span style=color:#960050;background-color:#1e0010>]</span>
