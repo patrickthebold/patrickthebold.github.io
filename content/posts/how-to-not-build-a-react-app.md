@@ -1,7 +1,7 @@
 ---
-title: "How to Not Build a React App"
-date: 2023-03-23T20:23:36-04:00
-draft: true
+title: "How to Not Build a React App (Part I)"
+date: 2023-03-28T20:23:36-04:00
+draft: false
 ---
 
 I've been meaning to write a post on "How I wish people made React apps" for a while now. Today I got annoyed by some HN [discussion](https://news.ycombinator.com/item?id=35270877) on React hooks.
@@ -49,7 +49,7 @@ At this point I want to test out the basic [example](https://github.com/websocke
 
 ## Frontend
 
-Let's give [vite](https://vitejs.dev/guide/) a try, since that seems the simplest way to get a dev server to proxy to our node backend.
+Let's give [vite](https://vitejs.dev/guide/) a try, since we'll want a dev server and a build tool.
 ```shell
 $ npm create vite@latest 
 ✔ Project name: … mpd-client
@@ -84,5 +84,66 @@ socket.addEventListener("message", (event) => {
 });
 
 ```
+If you have started the node server example `$ node index.mjs` you'll see logs in both the backend and frontend consoles.
+Note that we don't need to do anything with CORS since we are using a [websocket](https://blog.securityevaluators.com/websockets-not-bound-by-cors-does-this-mean-2e7819374acc).
 
-Interestingly, I don't seem to need to do anything with CORS even though the node server is on a different port.
+## Connect the sockets
+
+I'm hoping to have a small backend app so that my frontend can serve as a larger example. Of course we need to check out the docs for the [websocket](https://github.com/websockets/ws#use-the-nodejs-streams-api) and the [tcp connection](https://github.com/websockets/ws#use-the-nodejs-streams-api).
+
+I ended up with [cf45eee](https://github.com/patrickthebold/mpd-bridge/blob/cf45eee7a5221276fca7bd37f79b8c8d3d36f275/index.mjs)
+```js
+import { WebSocketServer, createWebSocketStream } from 'ws';
+import * as net from 'net';
+
+// We Allow configuration through environmental variables.
+// If a MPD_UNIX_SOCKET is set it will override the host and port combination.
+const MPD_HOST = process.env.MPD_HOST ?? 'localhost';
+const MPD_PORT = parseInt(process.env.MPD_PORT ?? '6600');
+const MPD_UNIX_SOCKET = process.env.MPD_UNIX_SOCKET;
+
+
+const wss = new WebSocketServer({ port: 8080 });
+
+wss.on('connection', (ws) => {
+  const webSocket = createWebSocketStream(ws, { encoding: 'utf8' });
+
+  webSocket.on('error', console.error);
+  const mpdSocket = MPD_UNIX_SOCKET ? 
+    net.connect(MPD_UNIX_SOCKET) :  
+    net.connect(MPD_PORT, MPD_HOST);
+
+  webSocket.pipe(mpdSocket);
+  mpdSocket.pipe(webSocket);
+});
+```
+I happen to run my raspberry pi on a static ip so I can do `$ MPD_HOST='192.168.1.7' node index.mjs` to start the backend.
+As before, we can test out the connection from the browser's console:
+
+```js
+let response;
+const socket = new WebSocket("ws://localhost:8080");
+
+socket.addEventListener("message", (event) => {
+    response = event
+});
+socket.send('status\n')
+r.data.text().then(console.log)
+> volume: 100
+> repeat: 0
+> random: 0
+> single: 0
+> consume: 0
+> playlist: 1
+> playlistlength: 39
+> xfade: 0
+> state: pause
+> song: 29
+> songid: 1
+> nextsong: 30
+> nextsongid: 2
+> time: 1:257
+> elapsed: 1.855
+> bitrate: 0
+> OK
+```
