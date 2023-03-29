@@ -89,7 +89,7 @@ Note that we don't need to do anything with CORS since we are using a [websocket
 
 ## Connect the sockets
 
-I'm hoping to have a small backend app so that my frontend can serve as a larger example. Of course we need to check out the docs for the [websocket](https://github.com/websockets/ws#use-the-nodejs-streams-api) and the [tcp connection](https://github.com/websockets/ws#use-the-nodejs-streams-api).
+I'm hoping to have a small backend app so that my frontend can serve as a larger example. Of course, we need to check out the docs for the [websocket](https://github.com/websockets/ws#use-the-nodejs-streams-api) and the [tcp connection](https://github.com/websockets/ws#use-the-nodejs-streams-api).
 
 I ended up with [cf45eee](https://github.com/patrickthebold/mpd-bridge/blob/cf45eee7a5221276fca7bd37f79b8c8d3d36f275/index.mjs)
 ```js
@@ -128,7 +128,7 @@ socket.addEventListener("message", (event) => {
     response = event
 });
 socket.send('status\n')
-r.data.text().then(console.log)
+response.data.text().then(console.log)
 > volume: 100
 > repeat: 0
 > random: 0
