@@ -147,3 +147,5 @@ response.data.text().then(console.log)
 > bitrate: 0
 > OK
 ```
+
+Note that `data` is a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob/text) which is why we have to call `.text()`. Also it's a bit unclear to me how things are buffered, or how the data will be split up across websocket messages. It would be nice if `OK` was always at the end of a websocket message, but I'm not sure we can count on that.
