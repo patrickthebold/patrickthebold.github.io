@@ -117,7 +117,13 @@ wss.on('connection', (ws) => {
   mpdSocket.pipe(webSocket);
 });
 ```
-I happen to run my raspberry pi on a static ip so I can do `$ MPD_HOST='192.168.1.7' node index.mjs` to start the backend.
+I happen to run my raspberry pi on a static ip so I can do 
+
+```shell
+$ export c='192.168.1.7' 
+$ node index.mjs
+``` 
+to start the backend.
 As before, we can test out the connection from the browser's console:
 
 ```js
