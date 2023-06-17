@@ -1,11 +1,11 @@
 ---
 title: "How to Not Build a React App (Part II)"
 subtitle: "State Management"
-date: 2023-03-28T21:23:51-04:00
+date: 2023-04-28T21:23:51-04:00
 draft: false
 ---
 
-[See Part I]({{< ref "how-to-not-build-a-react-app" >}} "About Us")
+[Part I]({{< ref "how-to-not-build-a-react-app" >}} "Part I")
 
 ## The Way
 
