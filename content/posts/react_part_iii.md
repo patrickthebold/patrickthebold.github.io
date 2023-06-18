@@ -9,11 +9,13 @@ draft: false
 
 The design will be personal, as this app has a target audience of one. I see three main pages:
 
-1. The current track.
+1. The player.
 1. The queue.
 1. The library. 
 
-## The Current Track
+In this post I will focus on the Player, and furthermore, modeling the state needed for the player.
+
+## The Player
 
 Here we need information about the current track:
 * Title
