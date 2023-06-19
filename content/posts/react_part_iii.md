@@ -5,7 +5,7 @@ date: 2023-05-22T14:40:27-04:00
 draft: false
 ---
 
-[Part I]({{< ref "how-to-not-build-a-react-app" >}} "Part I")
+Back to: [Part I]({{< ref "how-to-not-build-a-react-app" >}} "Part I")
 
 The design will be personal, as this app has a target audience of one. I see three main pages:
 
@@ -142,3 +142,4 @@ export type MpdCommand = {type: 'pause'} | {type: 'stop'} | {type: 'next_track'}
 ```
 You see the status which is what we believe to be true, and the two queues. Finally there is the `responseData` we need to track the server's reply to the `sentCommands`. Since we will have something watching the state, it will be able to see if `responseData` ends in "OK" to know that the sent commands are finished (and do error handling). But we haven't gotten there quite yet.
 
+Next: [Part IIII (Handlers)]({{< ref "react-part-iiii" >}} "Part IIII")

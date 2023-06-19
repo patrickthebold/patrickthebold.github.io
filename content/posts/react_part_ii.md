@@ -5,7 +5,7 @@ date: 2023-04-28T21:23:51-04:00
 draft: false
 ---
 
-[Part I]({{< ref "how-to-not-build-a-react-app" >}} "Part I")
+Back to: [Part I]({{< ref "how-to-not-build-a-react-app" >}} "Part I")
 
 ## The Way
 
@@ -277,3 +277,5 @@ There's lots of search options, specifically using `contains` and `starts_with` 
 
 That should give the basics for building an app, there's lots more commands available in the API, but it we understand the above we can find anything else we need
 when we need it. Next post we will do some up front design and figure out what MPD commands go with the features we want to implement.
+
+Next: [Part III (Design)]({{< ref "react_part_iii" >}} "Part III")

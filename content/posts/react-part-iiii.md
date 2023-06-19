@@ -5,7 +5,7 @@ date: 2023-06-17T20:15:58-04:00
 draft: false
 ---
 
-[Part I]({{< ref "how-to-not-build-a-react-app" >}} "Part I")
+Back to: [Part I]({{< ref "how-to-not-build-a-react-app" >}} "Part I")
 
 ## Orientation
 
