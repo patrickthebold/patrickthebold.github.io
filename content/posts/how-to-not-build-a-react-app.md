@@ -120,7 +120,7 @@ wss.on('connection', (ws) => {
 I happen to run my raspberry pi on a static ip so I can do 
 
 ```shell
-$ export c='192.168.1.7' 
+$ export MPD_HOST='192.168.1.7'
 $ node index.mjs
 ``` 
 to start the backend.
