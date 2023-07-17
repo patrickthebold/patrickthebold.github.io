@@ -1,5 +1,6 @@
 ---
-title: "React Part V"
+title: "How to Not Build a React App (Part V)"
+subtitle: "Managing the websocket connection"
 date: 2023-06-18T22:16:09-04:00
 draft: true
 ---
