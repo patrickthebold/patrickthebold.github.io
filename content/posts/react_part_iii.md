@@ -9,9 +9,9 @@ Back to: [Part I]({{< ref "how-to-not-build-a-react-app" >}} "Part I")
 
 The design will be personal, as this app has a target audience of one. I see three main pages:
 
-1. The player.
-1. The queue.
-1. The library. 
+1. The player: Current song, basic controls.
+1. The queue: Upcoming songs.
+1. The library: Search and browse.
 
 In this post I will focus on the Player, and furthermore, modeling the state needed for the player.
 
@@ -60,7 +60,7 @@ export type PlayStatus = {
 ### State II: Side Effects and Server Communication.
 
 #### Background Tangent
-Our app of course will need to talk to the mpd server. Right now I plan on doing things differently than most popular frameworks. I think I have a good motivation, but we shall see if it works out well. First, let's discuss some of the existing options.
+Our app will need to talk to the mpd server. Right now I plan on doing things differently than most popular frameworks. I think I have a good motivation, but we shall see if it works out well. First, let's discuss some of the existing options.
 
 [Redux Saga](https://redux-saga.js.org/) has this example:
 ```ts
@@ -107,15 +107,12 @@ Here, there is a hook that does the side effect directly in the component.
 #### The Gist of Our Approach
 
 We will do something more in line with Redux Saga, but instead of the side effects being driven off of the actions the side effects will happen based on the _state_.
-Let's do a quick review of our [state management](https://github.com/patrickthebold/mpd-client/blob/ac0ac08a61947190beb238274233869401c839a6/src/state-management.ts) and how it relates to Redux. If you follow that link you see we have a `createHandler`. A handler will take the place of both an action creator and a reducer. We won't dispatch actions, but instead invoke the handlers directly. (The arguments to the handler will be the `payload` that is typically part of a Redux action.) Instead of "action" I'll use the term "MpdCommand" for the side effects we need to send to the server. We will store the commands in our state and there will be some analogue of middleware that watches the state and performs side effects based on the state.
+Let's do a quick review of our [state management](https://github.com/patrickthebold/mpd-client/blob/ac0ac08a61947190beb238274233869401c839a6/src/state-management.ts) and how it relates to Redux. If you follow that link you see we have a `createHandler`. A handler replaces both an action creator and a reducer. We won't dispatch actions, but instead invoke the handlers directly. (The arguments to the handler will be the `payload` that is typically part of a Redux action.) Instead of "action" I'll use the term "MpdCommand" for the side effects we need to send to the server. We will store the commands in our state and there will be some analogue of middleware that watches the state and performs side effects based on the state.
 
 "Handlers" are for events in the browser and the effect will be to update the state object, "commands" or "MpdCommands" represent messages we need to send (or have sent) over the websocket, which ultimately ends up at the Mpd server.
 
-I'll give a detailed example soon, but first let me explain why I want to take this approach: If you look at the [protocol](https://mpd.readthedocs.io/en/latest/protocol.html#requests) there is no documentation on sending a request while one is in progress. There is a [command list](https://mpd.readthedocs.io/en/latest/protocol.html#command-lists) option, but you need to know all the commands up front. I did not experiment with what happens when you send a request while one is in progress, and frankly because it is not documented I'd rather not try. This means I cannot always immediately send a command: Say the user adds a bunch of songs to the queue and while that is happening they press "pause", I have to wait until the song additions finish before sending the "pause" command. I need to hold a queue of pending commands somewhere. Since I've already decided in keeping one large object with all of the state that seems like the place to put it. Thus, the user clicking "pause" in the browser will be a browser event, it will be handled by a "handler" which will update the state by adding the "pause" `MpdCommand` to a queue in the state. Something else will watch the state and actually send the messages on the websocket at the appropriate time.
+I also find this approach aesthetically appealing. Part of the appeal of React is your UI can be _declarative_. Recall, the UI is basically a function from the state to some DOM. I want a similar pattern where the websocket events sent are also a function of the state. There will be two observers of the state. One asks, "What DOM should I show the user?" the other "What messages do I need to send the server?"
 
-I also find this approach aesthetically appealing. I'm promoting this idea of having all[^most] state in a single object with ui/dom a function of the state. Every time the state changes our function runs and produces the desired state. This makes our programming _declarative_, and React handles the actual side effects needed to bring the browser's dom in-line with what we declared. I can have another function that depends on the state that computes what messages need to be sent on the websocket. The rough parallel is that updating the browsers DOM and sending messages on the websocket are both side effects. There's no "React for websocket events" nor "React for http calls", so things will be a bit different, but that's kind of what I am aiming for.
-
-[^most]: most, because probably can't get things like the url or window size, in your state.
 
 #### The Finer Points of State
 
@@ -142,4 +139,3 @@ export type MpdCommand = {type: 'pause'} | {type: 'stop'} | {type: 'next_track'}
 ```
 You see the status which is what we believe to be true, and the two queues. Finally there is the `responseData` we need to track the server's reply to the `sentCommands`. Since we will have something watching the state, it will be able to see if `responseData` ends in "OK" to know that the sent commands are finished (and do error handling). But we haven't gotten there quite yet.
 
-Next: [Part IIII (Handlers)]({{< ref "react-part-iiii" >}} "Part IIII")

@@ -2,7 +2,7 @@
 title: "How to Not Build a React App (Part IIII)"
 subtitle: "(Player) Handlers and Yak Shaving"
 date: 2023-06-17T20:15:58-04:00
-draft: false
+draft: true
 ---
 
 Back to: [Part I]({{< ref "how-to-not-build-a-react-app" >}} "Part I")
