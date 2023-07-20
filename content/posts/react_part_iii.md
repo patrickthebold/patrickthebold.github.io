@@ -139,3 +139,4 @@ export type MpdCommand = {type: 'pause'} | {type: 'stop'} | {type: 'next_track'}
 ```
 You see the status which is what we believe to be true, and the two queues. Finally there is the `responseData` we need to track the server's reply to the `sentCommands`. Since we will have something watching the state, it will be able to see if `responseData` ends in "OK" to know that the sent commands are finished (and do error handling). But we haven't gotten there quite yet.
 
+Next: [Part IIII (Handlers)]({{< ref "react-part-iiii" >}} "Part IIII")

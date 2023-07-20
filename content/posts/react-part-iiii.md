@@ -1,8 +1,8 @@
 ---
 title: "How to Not Build a React App (Part IIII)"
-subtitle: "(Player) Handlers and Yak Shaving"
+subtitle: "(Player) Handlers"
 date: 2023-06-17T20:15:58-04:00
-draft: true
+draft: false
 ---
 
 Back to: [Part I]({{< ref "how-to-not-build-a-react-app" >}} "Part I")
@@ -13,7 +13,7 @@ In the [previous post]({{< ref "react_part_iii" >}} "Part II") I said there woul
 
 1. The player.
 1. The queue.
-1. The library. 
+1. The library.
 
 We only got to talking about the state for the player. This post should be simpler: I'm only going to implement the handler's needed. Recall, our "handlers" are roughly an action builder and a reducer, for those familiar with Redux. They handle events in the browser, and update the state.
 
@@ -26,56 +26,76 @@ From a [domain](https://en.wikipedia.org/wiki/Domain-driven_design) perspective 
 
 ## Connection States.
 
-The way I set up the [state management](https://github.com/patrickthebold/mpd-client/blob/ac0ac08a61947190beb238274233869401c839a6/src/state-management.ts) I need an initial state before I can create a handler. I may go back and change this later, but I imagine I want some states involving the websocket connection. Something like "Disconnected", "Connecting", "Connected". Where the state we talked about in the last post is really only for when we are connected. Recall we have a queue for pending user intents, I think I will always have this queue available even when we are disconnected.
+The way I set up the [state management](https://github.com/patrickthebold/mpd-client/blob/ac0ac08a61947190beb238274233869401c839a6/src/state-management.ts) I need an initial state before I can create a handler. I may go back and change this later, but I imagine I want some states involving the websocket connection. Something like "Disconnected", "Connecting", "Connected". Where the state we talked about in the last post is really only for when we are connected. We also have a `BaseState` for data available regardless of the websocket status.
+
+Also since we are using `immutable.js` note that we have `Records` for objects we want to change and `Readonly` otherwise.
 ```ts
 export type State = ConnectedState | DisconnectedState | ConnectingState;
 
-export type ConnectedState = {
-    websocket: 'connected';
-    player: PlayerStatus;
-    sentIntents: UserIntent[];
-    pendingIntents: UserIntent[];
+type BaseStateProps = {
+  player?: PlayerStatus;
+  pendingIntents: List<UserIntent>;
+};
+
+export type ConnectedState = RecordOf<
+  BaseStateProps & {
+    websocketStatus: "connected";
+    sentIntents: List<UserIntent>;
     responseData: string;
-}
+  }
+>;
 
-export type DisconnectedState = {
-    websocket: 'disconnected';
-    pendingIntents: UserIntent[];
-}
-export type ConnectingState = {
-    websocket: 'connecting';
-    pendingIntents: UserIntent[];
-}
+type DisconnectedStateProps = BaseStateProps & {
+  websocketStatus: "disconnected";
+  failure?: RecordOf<{ time: Date; count: number }>;
+};
+export type DisconnectedState = RecordOf<DisconnectedStateProps>;
+
+export type ConnectingState = RecordOf<
+  BaseStateProps & {
+    websocketStatus: "connecting";
+  }
+>;
 ```
-[24deb60](https://github.com/patrickthebold/mpd-client/blob/24deb6020005e7021150e87bd034864a448458c0/src/state.ts)
-
-## Immutable
-
-I also said I would try out Immutable.js. Those [changes](https://github.com/patrickthebold/mpd-client/commit/26115f490bad2b254fb491505e3cf991172b634d) are straightforward, but I will note that I am using records for parts of the state that are expected to change over time, and `Readonly` objects elsewhere.
+[8a3a531](https://github.com/patrickthebold/mpd-client/blob/8a3a53138fa82b3f3c660e5b4af4af53342eecaa/src/state.ts#L14-L39)
 
 ## The handlers
 
 Apologies for number of higher order functions, but there's a clear pattern where we want a handler that takes some data, produces a `UserIntent` and pushes that on the pending intents queue. This is:
 ```ts
 type Handler<T extends unknown[]> = (...t: T) => void;
-export const makeIntentHandler = <T extends unknown[]>(makeIntent: (...args: T) => UserIntent): Handler<T> => createHandler((s, ...args) => {
-    const intent = makeIntent(...args)
+export const makeIntentHandler = <T extends unknown[]>(
+  makeIntent: (...args: T) => UserIntent
+): Handler<T> =>
+  createHandler((s, ...args) => {
+    const intent = makeIntent(...args);
     // We need the switch to make typescript happy
-    switch (s.websocket) {
-        case "connected": return s.update('pendingIntents', intents => intents.push(intent));
-        case "disconnected": return s.update('pendingIntents', intents => intents.push(intent));
-        case "connecting":return s.update('pendingIntents', intents => intents.push(intent));
+    switch (s.websocketStatus) {
+      case "connected":
+        return s.update("pendingIntents", (intents) => intents.push(intent));
+      case "disconnected":
+        return s.update("pendingIntents", (intents) => intents.push(intent));
+      case "connecting":
+        return s.update("pendingIntents", (intents) => intents.push(intent));
     }
-})
+  });
 ```
+[8a3a531](https://github.com/patrickthebold/mpd-client/blob/8a3a53138fa82b3f3c660e5b4af4af53342eecaa/src/state.ts#L67-L82)
 
 We can then make handlers for all the events we expect to handle from the UI:
 
 ```ts
-export const pause = makeIntentHandler(() => ({type: 'pause'}));
-export const stop = makeIntentHandler(() => ({type: 'stop'}))
-export const nextTrack = makeIntentHandler(() => ({type: 'next_track'}))
-export const previousTrack = makeIntentHandler(() => ({type: 'previous_track'}))
-export const setVolume = makeIntentHandler((volume: number) => ({type: 'set_volume', volume}))
+
+export const pause = makeIntentHandler(() => ({ type: "pause" }));
+export const stop = makeIntentHandler(() => ({ type: "stop" }));
+export const nextTrack = makeIntentHandler(() => ({ type: "next_track" }));
+export const previousTrack = makeIntentHandler(() => ({
+  type: "previous_track",
+}));
+export const setVolume = makeIntentHandler((volume: number) => ({
+  type: "set_volume",
+  volume,
+}));
+
 ```
-[3405d0a](https://github.com/patrickthebold/mpd-client/commit/3405d0acaa701710f4f5a01ba0604e6b0eae6a43)
+[8a3a531](https://github.com/patrickthebold/mpd-client/blob/8a3a53138fa82b3f3c660e5b4af4af53342eecaa/src/player/handlers.ts)
