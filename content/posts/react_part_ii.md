@@ -109,14 +109,14 @@ Normally I'd go back and forth between the state and the view, but I'm going to 
 First we will explore the...
 
 ### MPD API
-Things will be easier if there's not too much of a mismatch between our models and theirs. I'll `telnet` directly with mpd rather than use our websocket bridge.$
+Things will be easier if there's not too much of a mismatch between our models and theirs. I'll `nc -v` directly with mpd rather than use our websocket bridge.$
 
 #### idle
 First we notice there is an [`idle`](https://mpd.readthedocs.io/en/latest/protocol.html#querying-mpd-s-status) command. I'm going to send the idle command twice (shown below). From another App I will add a song and play it. Below I am adding a `>` to indicate text I send in the terminal, and `!` to describe an action done on another app. This is so you can see the order of things
 
 
 ```
-$ telnet $MPD_HOST 6600
+$ nc -v $MPD_HOST 6600
 Trying 192.168.1.7...
 Connected to 192.168.1.7.
 Escape character is '^]'.
