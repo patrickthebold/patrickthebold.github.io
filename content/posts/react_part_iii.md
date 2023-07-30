@@ -1,6 +1,6 @@
 ---
 title: "How to Not Build a React App (Part III)"
-subtitle: "Design"
+subtitle: "Design and Effects"
 date: 2023-05-22T14:40:27-04:00
 draft: false
 ---
