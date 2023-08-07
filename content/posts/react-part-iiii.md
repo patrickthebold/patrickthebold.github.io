@@ -99,3 +99,5 @@ export const setVolume = makeIntentHandler((volume: number) => ({
 
 ```
 [8a3a531](https://github.com/patrickthebold/mpd-client/blob/8a3a53138fa82b3f3c660e5b4af4af53342eecaa/src/player/handlers.ts)
+
+Next: [Part V (Better Record Types)]({{< ref "react-part-v" >}} "Part V")
