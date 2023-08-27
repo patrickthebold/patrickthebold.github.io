@@ -139,4 +139,4 @@ Partial<Props> extends FactoryProps<Props, requiredKeys>
 ```
 is just so you don't have to pass the empty object when there are no `requiredKeys`. Note that `requiredKeys` defaults to `never`, which is the empty union.
 
-Next: [Part VI (Effects in Anger)]({{< ref "react-vi-effects" >}} "Part VI")
+Next: [Part VI (Trigger effects based on the state not on events!)]({{< ref "react-vi-effects" >}} "Part VI")

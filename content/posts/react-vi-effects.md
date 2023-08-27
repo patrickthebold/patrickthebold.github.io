@@ -5,6 +5,8 @@ date: 2023-08-20T12:16:09-04:00
 draft: false
 ---
 
+Back to: [Part I]({{< ref "how-to-not-build-a-react-app" >}} "Part I")
+
 Now we get a chance  to demonstrate the "effects based on state" idea. Our state is a discriminated union of:
 ```ts
 type State = ConnectedState | DisconnectedState | ConnectingState;
@@ -78,3 +80,5 @@ export const ensureConnection: Effect = (state) => {
 
   - Finally I just want to emphasize that the websocket provides several [events](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket#events), and like most events, we attach [handlers](https://github.com/patrickthebold/mpd-client/pull/1/files#diff-a9f393297cb1ae3eab8a110bcb9bb34262e01f6b0cbdb63f276c0e793012008aR23-R42) to them.
   And we handle the actual messages in a future [PR](https://github.com/patrickthebold/mpd-client/pull/4/files)
+
+  Next: [Part VII (Wherein it feels like we are starting to reimplement RxJS)]({{< ref "react-vii-rxjs" >}} "Part VII")
