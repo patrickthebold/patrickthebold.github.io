@@ -38,7 +38,7 @@ export type ConsumerTransformer<
 ```
 ## Coeffects from a Producer.
 
-Since the current time is easily available as `new Date()`, getting the time isn't really the problem, the problem is triggering out consumers when the time changes. Specifically, we decided to trigger effects based off of the state, and we want to reconnect a failed websocket connection after a few seconds, so we'd like to produce the current state and time at least once a second. (side note: now that I think about it, I am syncing the websocket state with my application state, I think I can refactor that out to be another coeffect.)
+Since the current time is easily available as `new Date()`, getting the time isn't really the problem, the problem is triggering out consumers when the time changes. Specifically, we decided to trigger effects based off of the state, and we want to reconnect a failed websocket connection after a few seconds, so we'd like to produce the current state and time at least once a second. (side note, there is a bit of a smell since I have the websocket and a string representing the websocket state in my application state.)
 
 In any case it seems there might be a general pattern where we can easily produce a value: `Producer<T> = () => T`, and want to get a `ConsumerTransformer` that removes `T` as a parameter from the consumer. "Remove" might seem backwards, but if you have something that can produce a `T` you can transform something that needs `X` and `T` into something that just needs `X`. 
 The code is [here](https://github.com/patrickthebold/mpd-client/pull/6/files).
